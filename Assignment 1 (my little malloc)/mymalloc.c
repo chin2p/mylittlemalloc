@@ -17,9 +17,6 @@ void mymalloc(size_t size, char *file, int line) {
         printf("ERROR: Not enough space!");
         return;
     }
-
-
-
 }
 
 void myfree(void *ptr, char *file, int line){
