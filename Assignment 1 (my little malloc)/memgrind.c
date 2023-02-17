@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include "mymalloc.h"
 
 int main(int argc, char **argv)
 {
     int x, *p;
-    int test = argc > 1 ? atoi(argv[1]) : 0;
-    //int test = 6;
-
-
+    //int test = argc > 1 ? atoi(argv[1]) : 0;
+    int test = 7;
 
     switch (test) {
         default:
@@ -30,13 +27,18 @@ int main(int argc, char **argv)
             free(p);
             break;
         case 4:
-            p = (int *) malloc(5000);
+            p = (int *) malloc(50000);
+            free(p);
             break;
         case 5:
             p = (int*) malloc(0);
+            free(p);
             break;
         case 6:
             p = NULL;
+            free(p);
+        case 7:
+            p = (int*) malloc(sizeof(int) * 20);
             free(p);
     }
 
