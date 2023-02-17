@@ -7,6 +7,9 @@ int main(int argc, char **argv)
 {
     int x, *p;
     int test = argc > 1 ? atoi(argv[1]) : 0;
+    //int test = 6;
+
+
 
     switch (test) {
         default:
@@ -26,7 +29,18 @@ int main(int argc, char **argv)
             free(p);
             free(p);
             break;
+        case 4:
+            p = (int *) malloc(5000);
+            break;
+        case 5:
+            p = (int*) malloc(0);
+            break;
+        case 6:
+            p = NULL;
+            free(p);
     }
+
+    printf("\nit works!");
 
     return EXIT_SUCCESS;
 }
