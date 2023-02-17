@@ -13,17 +13,15 @@ static node *head = NULL;
 
 void* mymalloc(size_t size, char *file, int line) {
 
+
     if(size == 0){
-        printf("ERROR: insufficient memory!");
+        printf("ERROR: insufficient memory!\n");
         return NULL;
     }
 
     head = (node*)memory;
     head->size = MEMSIZE - sizeof(node);
     head->link = NULL;
-
-    // Round up the requested size to a multiple of the word size (to ensure proper alignment)
-    size = (size + sizeof(void*) - 1) / sizeof(void*) * sizeof(void*);
 
     // Search the free list for a block of the requested size
     node *prev = NULL;
@@ -50,13 +48,14 @@ void* mymalloc(size_t size, char *file, int line) {
         current = current->link;
     }
 
-    printf("ERROR: Not enough memory in heap!");
+    printf("ERROR: Not enough memory in heap!\n");
     return NULL;
 }
 
 void myfree(void *ptr, char *file, int line) {
+
     if (ptr == NULL) {
-        printf("Empty pointer!");
+        printf("Empty pointer!\n");
         return;
     }
 
