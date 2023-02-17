@@ -57,15 +57,26 @@ void myfree(void *ptr, char *file, int line) {
         printf("ERROR: Empty pointer!\n");
         return;
     }
+    
     // Check if the pointer is within the range of addresses managed by mymalloc
     if (ptr < (void*)memory || ptr >= (void*)(memory + MEMSIZE)) {
         printf("ERROR: Address is not obtained from malloc!");
         return;
     }
 
+    if (((char*)ptr - (char*)memory) % sizeof(node) != 0) {
+        printf("ERROR: Pointer is not at the start of a chunk!\n");
+        return;
+    }
 
     // Get the node that corresponds to the allocated block
     node *current = (node*)ptr - 1;
+
+    if (current->size == 0) {
+        printf("ERROR: Double free!\n");
+        return;
+    }
+    current->size = 0;
 
 
     // Add the block to the free list
@@ -88,6 +99,7 @@ void myfree(void *ptr, char *file, int line) {
         current->size += current->link->size + sizeof(node);
         current->link = current->link->link;
     }
+
     if (prev != NULL && (char*)prev + prev->size + sizeof(node) == (char*)current) {
         prev->size += current->size + sizeof(node);
         prev->link = current->link;
