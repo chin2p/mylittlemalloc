@@ -18,7 +18,6 @@ void* mymalloc(size_t size, char *file, int line) {
         return NULL;
     }
 
-
     head = (node*)memory;
     head->size = MEMSIZE - sizeof(node);
     head->link = NULL;
@@ -51,7 +50,7 @@ void* mymalloc(size_t size, char *file, int line) {
         current = current->link;
     }
 
-    printf("ERROR: Size requested not found!");
+    printf("ERROR: Not enough memory in heap!");
     return NULL;
 }
 
