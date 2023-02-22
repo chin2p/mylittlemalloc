@@ -17,11 +17,11 @@ void* mymalloc(size_t size, char *file, int line) {
         return NULL;
     }
 
-
-    head = (node*)memory;
-    head->size = MEMSIZE;
-    head->link = NULL;
-
+    if(head == NULL) {
+        head = (node *) memory;
+        head->size = MEMSIZE;
+        head->link = NULL;
+    }
 
     // Search the free list for a block of the requested size
     node *prev = NULL;
@@ -42,7 +42,12 @@ void* mymalloc(size_t size, char *file, int line) {
             } else {
                 prev->link = current->link;
             }
-            return (void*)(current + 1);
+
+            // Initialize the node header for the allocated block
+            node *allocated_block = current;
+            allocated_block->link = NULL;
+
+            return (void*)(allocated_block + 1);
         }
         prev = current;
         current = current->link;
@@ -54,54 +59,51 @@ void* mymalloc(size_t size, char *file, int line) {
 
 void myfree(void *ptr, char *file, int line) {
     if (ptr == NULL) {
-        printf("ERROR: Empty pointer!\n");
+        printf("ERROR: Attempt to free null pointer at %s:%d\n", file, line);
         return;
     }
 
-    // Check if the pointer is within the range of addresses managed by mymalloc
-    if (ptr < (void*)memory || ptr >= (void*)(memory + MEMSIZE)) {
-        printf("ERROR: Address is not obtained from malloc!");
+    // Get a pointer to the node containing the allocated block
+    node *block = (node*)ptr - 1;
+
+    // Check if the block is a valid block
+    if (block < (node*)memory || block >= (node*)(memory + MEMSIZE)) {
+        printf("ERROR: Attempt to free invalid memory at %s:%d\n", file, line);
         return;
     }
 
-    if (((char*)ptr - (char*)memory) % sizeof(node) != 0) {
-        printf("ERROR: Pointer is not at the start of a chunk!\n");
-        return;
+    // Check if the block is in the free list
+    node *current = head;
+    while (current != NULL) {
+        if (current == block) {
+            printf("ERROR: Double free of memory at %s:%d\n", file, line);
+            return;
+        }
+        current = current->link;
     }
 
-    // Get the node that corresponds to the allocated block
-    node *current = (node*)ptr - 1;
-
-    node *free_node = head;
-
-    current->size = 0;
-
-
-    // Add the block to the free list
+    // Find the correct place to insert the freed block in the free list
     node *prev = NULL;
-    free_node = (node*)memory;
-    while (free_node != NULL && free_node < current) {
-        prev = free_node;
-        free_node = free_node->link;
+    current = head;
+    while (current != NULL && current < block) {
+        prev = current;
+        current = current->link;
     }
-    if (prev == NULL) {
-        head = current;
-    } else {
-        prev->link = current;
-    }
-    current->link = free_node;
 
+    if (prev == NULL) {
+        head = block;
+    } else {
+        prev->link = block;
+    }
+    block->link = current;
 
     // Coalesce adjacent free blocks
-    if (current->link != NULL && (char*)current + current->size + sizeof(node) == (char*)current->link) {
-        current->size += current->link->size + sizeof(node);
-        current->link = current->link->link;
+    if (current != NULL && (char*)block + block->size + sizeof(node) == (char*)current) {
+        block->size += current->size + sizeof(node);
+        block->link = current->link;
     }
-
-    if (prev != NULL && (char*)prev + prev->size + sizeof(node) == (char*)current) {
-        prev->size += current->size + sizeof(node);
-        prev->link = current->link;
-        current = prev;
+    if (prev != NULL && (char*)prev + prev->size + sizeof(node) == (char*)block) {
+        prev->size += block->size + sizeof(node);
+        prev->link = block->link;
     }
-
 }
