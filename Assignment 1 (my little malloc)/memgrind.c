@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     int x, *p;
     //int test = argc > 1 ? atoi(argv[1]) : 0;
-    int test = 7;
+    int test = 1;
 
     switch (test) {
         default:
