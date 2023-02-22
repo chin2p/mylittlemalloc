@@ -13,7 +13,7 @@ static node *head = NULL;
 
 void* mymalloc(size_t size, char *file, int line) {
     if(size == 0){
-        printf("ERROR: insufficient memory!\n");
+        printf("ERROR: insufficient memory at %s:%d\n", file, line);
         return NULL;
     }
 
@@ -64,11 +64,15 @@ void myfree(void *ptr, char *file, int line) {
     }
 
     // Get a pointer to the node containing the allocated block
-    node *block = (node*)ptr - 1;
+    node *block = (node*)((char*)ptr - sizeof(node));
 
-    // Check if the block is a valid block
     if (block < (node*)memory || block >= (node*)(memory + MEMSIZE)) {
         printf("ERROR: Attempt to free invalid memory at %s:%d\n", file, line);
+        return;
+    }
+
+    if ((char*)ptr < (char*)block + sizeof(node) || (char*)ptr >= (char*)block + sizeof(node) + block->size) {
+        printf("ERROR: Attempt to free not at the start %s:%d\n", file, line);
         return;
     }
 
