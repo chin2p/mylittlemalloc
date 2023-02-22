@@ -12,16 +12,16 @@ typedef struct node {
 static node *head = NULL;
 
 void* mymalloc(size_t size, char *file, int line) {
-
-
     if(size == 0){
         printf("ERROR: insufficient memory!\n");
         return NULL;
     }
 
+
     head = (node*)memory;
-    head->size = MEMSIZE - sizeof(node);
+    head->size = MEMSIZE;
     head->link = NULL;
+
 
     // Search the free list for a block of the requested size
     node *prev = NULL;
@@ -57,7 +57,7 @@ void myfree(void *ptr, char *file, int line) {
         printf("ERROR: Empty pointer!\n");
         return;
     }
-    
+
     // Check if the pointer is within the range of addresses managed by mymalloc
     if (ptr < (void*)memory || ptr >= (void*)(memory + MEMSIZE)) {
         printf("ERROR: Address is not obtained from malloc!");
@@ -72,16 +72,14 @@ void myfree(void *ptr, char *file, int line) {
     // Get the node that corresponds to the allocated block
     node *current = (node*)ptr - 1;
 
-    if (current->size == 0) {
-        printf("ERROR: Double free!\n");
-        return;
-    }
+    node *free_node = head;
+
     current->size = 0;
 
 
     // Add the block to the free list
     node *prev = NULL;
-    node *free_node = (node*)memory;
+    free_node = (node*)memory;
     while (free_node != NULL && free_node < current) {
         prev = free_node;
         free_node = free_node->link;
@@ -105,4 +103,5 @@ void myfree(void *ptr, char *file, int line) {
         prev->link = current->link;
         current = prev;
     }
+
 }
