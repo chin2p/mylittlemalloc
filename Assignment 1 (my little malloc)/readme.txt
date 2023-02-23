@@ -20,7 +20,7 @@ Our implementations for malloc and free (We are using linked list for these meth
 mymalloc()
 ---------
 - Our malloc() takes three arguments: size, file and line. Firstly our function checks if size for the malloc call is zero. If it is zero then
-it prints an error message and returns NULL. After that we check if the linked list of free memory blocks is empty. We named this head, if it is empty
+it prints an error message and returns NULL. After that we check if the linked list of free memory blocks is empty. If it is empty
 then we initialize the linked list with entire memory block of size MEMSIZE. After we initialize the free list, we find a free memory block that is
 large enough to hold requested amount of memory. Then it divides it into two parts, one is the requested memory and other is the free memory. This
 returns a pointer to the start of block that holds requested memory. If there is not enough memory to allocate then it prints an error message and
@@ -45,11 +45,14 @@ All the testcases are in memgrind.c
 Test case 1 - calls free() with an address not obtained from malloc()
 Test case 2 - calls free() with an address not at the start of a chunk
 Test case 3 - calls free() a second time on the same pointer
-Test case 4 - calls malloc() with a size greater than MEMSIZE(4096)
+
+Additional correctness testing below:
+
+Test case 4 - checks if you can call free one after the other on different pointers
 Test case 5 - calls malloc() with a size of 0
 Test case 6 - calls free() on pointer = NULL
-Test case 7 - tests malloc() and free() with user inputs
-Test case 8 - calls malloc() with size 4096
+Test case 7 - shows that malloc() does reserve unallocated memory then frees and coalesces.
+Test case 8 - checks if malloc stores data and prints by user input, they input integers
 
 All the test cases below are performance testing.
 
