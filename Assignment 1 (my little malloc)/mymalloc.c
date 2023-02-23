@@ -9,6 +9,7 @@ typedef struct node {
     struct node *link;
 } node;
 
+
 static node *head = NULL;
 
 void* mymalloc(size_t size, char *file, int line) {
