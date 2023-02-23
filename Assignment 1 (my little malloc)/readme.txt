@@ -18,11 +18,26 @@ and this readme.txt file
 Our implementations for malloc and free (We are using linked list for these methods)
 
 malloc()
+---------
 - Our malloc() takes three arguments: size, file and line. Firstly our function checks if size for the malloc call is zero. If it is zero then
 it prints an error message and returns NULL. After that we check if the linked list of free memory blocks is empty. We named this head, if it is empty
 then we initialize the linked list with entire memory block of size MEMSIZE. After we initialize the free list, we find a free memory block that is
 large enough to hold requested amount of memory. Then it divides it into two parts, one is the requested memory and other is the free memory. This
-returns a pointer to the start of block that holds requested memory. If there is not enough memory to allocate then it prints an error message and returns NULL
+returns a pointer to the start of block that holds requested memory. If there is not enough memory to allocate then it prints an error message and
+returns NULL. Our struct node, represents block of memory. It contains size and link, size is the size of the block of memory blocks and link points
+to the next node in the linked list of free memory blocks. In the end, we return a pointer to the start of the block of memory that holds the requested memory.
+
+free()
+---------
+- Our free() takes three arguments: ptr, file and line. Our functions first checks if ptr is NULL and if it is then it prints an error message and
+returns because we can't free a pointer that is pointing to NULL. Our free() then calculates the address of the block of memory that needs to be
+freed then checks if that address is within bounds of our linked list size (MEMSIZE). If it is not then it prints an error message and returns.
+We need to make sure that we are freeing memory that has only been allocated by our malloc(). We also check if ptr is pointing to the start of
+the block of memory that has to be freed. If it's not then prints an error message and returns. This makes sure we are freeing the same pointer
+returned by our malloc(). We then search for the block of memory that needs to be freed, if we find a block that is already
+in the free list then we print an error message then return. As we are trying to free something which is already in the free block of memory.
+If the block is not in the free block of memory, then free() inserts it into free memory then checks if there are any adjacent free blocks of
+memory, if there are free blocks it coalesces them into a single free block. This helps when we have to do future allocations.
 
 
 Test cases - 
@@ -35,6 +50,9 @@ Test case 5 - calls malloc() with a size of 0
 Test case 6 - calls free() on pointer = NULL
 Test case 7 - tests malloc() and free() with user inputs
 Test case 8 - calls malloc() with size 4096
+
+All the test cases below are performance testing.
+
 Test case 9 - calls malloc() and immediately free() a 1-byte chunk, 120 times
 Test case 10 - Use malloc() to get 120 1-byte chunks, storing the pointers in an array, then use free() to deallocate the chunks.
 Test case 11 - Randomly choose between:
