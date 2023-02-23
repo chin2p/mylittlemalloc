@@ -17,7 +17,7 @@ and this readme.txt file
 
 Our implementations for malloc and free (We are using linked list for these methods)
 
-malloc()
+mymalloc()
 ---------
 - Our malloc() takes three arguments: size, file and line. Firstly our function checks if size for the malloc call is zero. If it is zero then
 it prints an error message and returns NULL. After that we check if the linked list of free memory blocks is empty. We named this head, if it is empty
@@ -27,7 +27,7 @@ returns a pointer to the start of block that holds requested memory. If there is
 returns NULL. Our struct node, represents block of memory. It contains size and link, size is the size of the block of memory blocks and link points
 to the next node in the linked list of free memory blocks. In the end, we return a pointer to the start of the block of memory that holds the requested memory.
 
-free()
+myfree()
 ---------
 - Our free() takes three arguments: ptr, file and line. Our functions first checks if ptr is NULL and if it is then it prints an error message and
 returns because we can't free a pointer that is pointing to NULL. Our free() then calculates the address of the block of memory that needs to be
