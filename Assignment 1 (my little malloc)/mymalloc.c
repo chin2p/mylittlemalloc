@@ -9,24 +9,23 @@ typedef struct node {
     struct node *link;
 } node;
 
-
-static node *head = NULL;
-
 void* mymalloc(size_t size, char *file, int line) {
-    if(size == 0){
-        printf("ERROR: insufficient memory at %s:%d\n", file, line);
+
+    if (size == 0) {
+        printf("ERROR: Requested allocation of size 0 at %s:%d\n", file, line);
         return NULL;
     }
 
-    if(head == NULL) {
-        head = (node *) memory;
-        head->size = MEMSIZE;
-        head->link = NULL;
+    // Initialize the free list if it hasn't been initialized yet
+    if (*(node**)memory == NULL) {
+        (*(node**)memory) = (node*)(memory + sizeof(node*));
+        (*(node**)memory)->size = MEMSIZE - sizeof(node);
+        (*(node**)memory)->link = NULL;
     }
 
     // Search the free list for a block of the requested size
     node *prev = NULL;
-    node *current = head;
+    node *current = (*(node**)memory);
     while (current != NULL) {
         if (current->size >= size) {
             // We found a block of the requested size
@@ -39,7 +38,7 @@ void* mymalloc(size_t size, char *file, int line) {
                 current->link = new_node;
             }
             if (prev == NULL) {
-                head = current->link;
+                (*(node**)memory) = current->link;
             } else {
                 prev->link = current->link;
             }
@@ -48,19 +47,22 @@ void* mymalloc(size_t size, char *file, int line) {
             node *allocated_block = current;
             allocated_block->link = NULL;
 
-            return (void*)(allocated_block + 1);
+
+            return (void*)((char*)allocated_block + sizeof(node));
         }
         prev = current;
         current = current->link;
     }
 
-    printf("ERROR: Not enough memory in heap!\n");
+    printf("ERROR: Insufficient memory to allocate block of size %zu at %s:%d\n", size, file, line);
     return NULL;
 }
 
+
+
 void myfree(void *ptr, char *file, int line) {
     if (ptr == NULL) {
-        printf("ERROR: Attempt to free null pointer at %s:%d\n", file, line);
+        printf("ERROR: Trying to free null pointer at %s:%d\n", file, line);
         return;
     }
 
@@ -68,20 +70,20 @@ void myfree(void *ptr, char *file, int line) {
     node *block = (node*)((char*)ptr - sizeof(node));
 
     if (block < (node*)memory || block >= (node*)(memory + MEMSIZE)) {
-        printf("ERROR: Attempt to free invalid memory at %s:%d\n", file, line);
+        printf("ERROR: Trying to free memory outside of malloc at %s:%d\n", file, line);
         return;
     }
 
     if ((char*)ptr < (char*)block + sizeof(node) || (char*)ptr >= (char*)block + sizeof(node) + block->size) {
-        printf("ERROR: Attempt to free not at the start %s:%d\n", file, line);
+        printf("ERROR: Trying to free memory not at the start of the chunk at %s:%d\n", file, line);
         return;
     }
 
-    // Check if the block is in the free list
-    node *current = head;
+    // Check if the block is already in the free list
+    node *current = *(node**)memory;
     while (current != NULL) {
         if (current == block) {
-            printf("ERROR: Double free of memory at %s:%d\n", file, line);
+            printf("ERROR: Calling free twice on the same pointer at %s:%d\n", file, line);
             return;
         }
         current = current->link;
@@ -89,14 +91,14 @@ void myfree(void *ptr, char *file, int line) {
 
     // Find the correct place to insert the freed block in the free list
     node *prev = NULL;
-    current = head;
+    current = *(node**)memory;
     while (current != NULL && current < block) {
         prev = current;
         current = current->link;
     }
 
     if (prev == NULL) {
-        head = block;
+        *(node**)memory = block;
     } else {
         prev->link = block;
     }
@@ -110,5 +112,6 @@ void myfree(void *ptr, char *file, int line) {
     if (prev != NULL && (char*)prev + prev->size + sizeof(node) == (char*)block) {
         prev->size += block->size + sizeof(node);
         prev->link = block->link;
+        block = prev;
     }
 }
