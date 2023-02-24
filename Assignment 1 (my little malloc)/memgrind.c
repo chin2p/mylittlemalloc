@@ -165,7 +165,7 @@ int main(int argc, char **argv)
                 gettimeofday(&end, NULL);
                 time1 = (end.tv_sec - start.tv_sec) * 1000.0;
                 time1 += (end.tv_usec - start.tv_usec) / 1000.0;
-                printf("Iteration %d: %f ms\n", i+1,time );
+                printf("Iteration %d: %f ms\n", i+1,time1 );
             }
             break;
         case 11: //2
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
                 gettimeofday(&end, NULL);
                 time1 = (end.tv_sec - start.tv_sec) * 1000.0;
                 time1 += (end.tv_usec - start.tv_usec) / 1000.0;
-                printf("Iteration %d: %f ms\n", i+1,time );
+                printf("Iteration %d: %f ms\n", i+1,time1 );
             }
             break;
         case 12: //3
