@@ -13,6 +13,7 @@ memgrind.c (this includes all the test cases and performance testing)
 mymalloc.c (this includes our own malloc and free)
 mymalloc.h (this includes all the header files, containing function prototypes, other definitions)
 Makefile
+ourTest.c (we just made this just to test our program but we are mainly using memgrind for testing)
 and this readme.txt file
 
 Our implementations for malloc and free (We are using linked list for these methods)
@@ -42,25 +43,44 @@ memory, if there are free blocks it coalesces them into a single free block. Thi
 
 Test cases - 
 All the testcases are in memgrind.c
+
+Testcases 1-3 are the same test cases in the file err.c
+
 Test case 1 - calls free() with an address not obtained from malloc()
 Test case 2 - calls free() with an address not at the start of a chunk
 Test case 3 - calls free() a second time on the same pointer
 
-Additional correctness testing below:
+
+Correctness testing below:
+
+Testcases 4-6 are additional testcases that we should be checking
 
 Test case 4 - checks if you can call free one after the other on different pointers
 Test case 5 - calls malloc() with a size of 0
 Test case 6 - calls free() on pointer = NULL
+
+Test cases 7-9 are corectness testing mentioned in pa1.pdf
+
 Test case 7 - shows that malloc() does reserve unallocated memory then frees and coalesces.
-Test case 8 - checks if malloc stores data and prints by user input, they input integers
+Test case 8 - Allocates objects and fills them with distinct patterns and then ckecks if object is still contained after it just frees them.
+Test case 9 - checks if malloc stores data and prints by user input, they input integers
 
 All the test cases below are performance testing.
 
-Test case 9 - calls malloc() and immediately free() a 1-byte chunk, 120 times
-Test case 10 - Use malloc() to get 120 1-byte chunks, storing the pointers in an array, then use free() to deallocate the chunks.
-Test case 11 - Randomly choose between:
+Testcases 10-12 are the same performance test cases which are in the pa1.pdf file on canvas.
+
+Test case 10 - calls malloc() and immediately free() a 1-byte chunk, 120 times
+Test case 11 - Use malloc() to get 120 1-byte chunks, storing the pointers in an array, then use free() to deallocate the chunks.
+Test case 12 - Randomly choose between:
                 . Allocating a 1-byte chunk and storing the pointer in an array.
                 . Deallocating one of the chunks in the array (if any)
                Repeat until you have called malloc() 120 times, then free all remaining allocated chunks.
-Test case 12 - 
-Test case 13 -
+
+
+Testcases 13-14 are the two more stress tests (that we had to make) mentioned in pa1.pdf
+
+Test case 13 - is a performance test for the bubble sort algorithm. It measures the time taken to sort an 
+array of 10,000 randomly generated integers using bubble sort, and repeats the process 50 times.
+
+Test case 14 - is a performance test by measuring the time it takes to run a specific operation on an array of 50,000 randomly 
+generated integers. The test is run 50 times, with the time taken for each iteration being recorded and printed to the console.
