@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 #include <sys/time.h>
 #include "mymalloc.h"
@@ -8,18 +9,24 @@ int main(int argc, char **argv)
     int x, *p,*h, size;
 
     struct timeval start, end;
-    double time;
+    double time1;
+    srand(time(NULL));
 
     void *pA[120];
     int numP = 0;
+    int array[500000];
 
     void* ptr1;
     void* ptr2;
 
 
+    void *objects[3];
+    void fill_object(void *ptr, int pattern);
+    int check_object(void *ptr, int pattern);
+    void performOperation(int array[], int size);
+
     int test = argc > 1 ? atoi(argv[1]) : 0;
-
-
+   
     switch (test) {
         default:
             puts("Missing or invalid test number");
@@ -38,8 +45,8 @@ int main(int argc, char **argv)
             break;
             //*************************************************CORRECTNESS TESTING****************************************************
         case 4:                             //checks if you can call free one after the other (on different pointers of course).
-            p = (int *) malloc(2500);
-            h = (int *) malloc(1500);
+            p = (int *) malloc(2000);
+            h = (int *) malloc(1000);
             free(p);
             free(h);
             printf("Works perfectly!");
@@ -98,7 +105,34 @@ int main(int argc, char **argv)
             printf("ptr3: %p\n", ptr3);
 
             break;
-        case 8:                                //Checks if malloc stores data and prints
+        case 8:
+
+            // Allocate objects and fill them with distinct patterns
+            for (int i = 0; i < 3; i++) {
+                objects[i] = malloc(1024);
+                if (objects[i] == NULL) {
+                    printf("Failed to allocate object %d\n", i);
+                    exit(1);
+                }
+                fill_object(objects[i], i + 1);
+            }
+
+            // Check that each object still contains the written pattern
+            for (int i = 0; i < 3; i++) {
+                if (!check_object(objects[i], i + 1)) {
+                    printf("Object %d does not contain the written pattern\n", i);
+                    exit(1);
+                }
+            }
+
+            // Free the objects
+            for (int i = 0; i < 3; i++) {
+                free(objects[i]);
+            }
+
+            printf("WORKS!\n");
+            break;
+        case 9:                                //Checks if malloc stores data and prints
             printf("Please enter the amount of integers needed: ");
             scanf("%d", &size);
 
@@ -120,7 +154,7 @@ int main(int argc, char **argv)
 
             break;
             //******************************************************PERFORMANCE TESTING******************************************************
-        case 9: //1
+        case 10: //1
             printf("Performance Test 1:\n\n");
             for (int i = 0; i < 50; i++) {
                 gettimeofday(&start, NULL);
@@ -129,12 +163,12 @@ int main(int argc, char **argv)
                     free(p);
                 }
                 gettimeofday(&end, NULL);
-                time = (end.tv_sec - start.tv_sec) * 1000.0;
-                time += (end.tv_usec - start.tv_usec) / 1000.0;
+                time1 = (end.tv_sec - start.tv_sec) * 1000.0;
+                time1 += (end.tv_usec - start.tv_usec) / 1000.0;
                 printf("Iteration %d: %f ms\n", i+1,time );
             }
             break;
-        case 10: //2
+        case 11: //2
             printf("Performance Test 2:\n\n");
             for (int i = 0; i < 50; i++) {
                 gettimeofday(&start, NULL);
@@ -145,12 +179,12 @@ int main(int argc, char **argv)
                     free(pA[j]);
                 }
                 gettimeofday(&end, NULL);
-                time = (end.tv_sec - start.tv_sec) * 1000.0;
-                time += (end.tv_usec - start.tv_usec) / 1000.0;
+                time1 = (end.tv_sec - start.tv_sec) * 1000.0;
+                time1 += (end.tv_usec - start.tv_usec) / 1000.0;
                 printf("Iteration %d: %f ms\n", i+1,time );
             }
             break;
-        case 11: //3
+        case 12: //3
             printf("Performance Test 3:\n\n");
             for(int j = 0; j < 50; j++) {
                 int n = 0;
@@ -183,6 +217,85 @@ int main(int argc, char **argv)
                 }
             }
             break;
+        case 13:
+            printf("Performance Test 4:\n\n");
+            for(int j = 0; j < 50; j++) {
+                // Initialize array with random values
+                int arr[10000];
+                for (int i = 0; i < 10000; i++) {
+                    arr[i] = rand() % 1000;
+                }
+
+                // Sort array using bubble sort algorithm
+                gettimeofday(&start, NULL);
+
+                for (int i = 0; i < 10000; i++) {
+                    for (int j = 0; j < 10000 - i - 1; j++) {
+                        if (arr[j] > arr[j + 1]) {
+                            int temp = arr[j];
+                            arr[j] = arr[j + 1];
+                            arr[j + 1] = temp;
+                        }
+                    }
+                }
+
+                gettimeofday(&end, NULL);
+
+                // Print results
+                double time = (end.tv_sec - start.tv_sec) * 1000.0;
+                time += (end.tv_usec - start.tv_usec) / 1000.0;
+                printf("Iteration %d: Time taken to sort %d integers using bubble sort: %f ms\n", j+1, 10000, time);
+            }
+            break;
+        case 14:
+            srand(time(NULL));
+
+            // Initialize array with random integers
+            for (int i = 0; i < 50000; i++) {
+                array[i] = rand() % (999 + 1);
+            }
+
+            // Perform operation 50 times and measure time for each iteration
+            printf("Performance Test 5:\n\n");
+            for (int i = 0; i < 50; i++) {
+                gettimeofday(&start, NULL);
+
+                performOperation(array, 50000);
+
+                gettimeofday(&end, NULL);
+                time1 = (end.tv_sec - start.tv_sec) * 1000.0;
+                time1 += (end.tv_usec - start.tv_usec) / 1000.0;
+                printf("Iteration %d: %f ms\n", i+1, time1);
+            }
+
+            break;
     }
     return EXIT_SUCCESS;
+}
+
+void fill_object(void *ptr, int pattern)
+{
+    memset(ptr, pattern, 1024);
+}
+
+int check_object(void *ptr, int pattern)
+{
+    for (int i = 0; i < 1024; i++) {
+        if (((char*)ptr)[i] != pattern) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+void performOperation(int array[], int size) {
+    int count = 0;
+
+    for (int i = 0; i < size; i++) {
+        if (array[i] % 2 == 0) {
+            count++;
+        }
+    }
+
+    printf("Number of even integers in array: %d\n", count);
 }
