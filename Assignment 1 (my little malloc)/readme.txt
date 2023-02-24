@@ -13,7 +13,6 @@ memgrind.c (this includes all the test cases and performance testing)
 mymalloc.c (this includes our own malloc and free)
 mymalloc.h (this includes all the header files, containing function prototypes, other definitions)
 Makefile
-ourTest.c (we just made this just to test our program but we are mainly using memgrind for testing)
 and this readme.txt file
 
 Our implementations for malloc and free (We are using linked list for these methods)
